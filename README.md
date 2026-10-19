@@ -1,83 +1,85 @@
 # Computer Monitor
 
-macOS 選單列硬體監控小工具：即時顯示 CPU、記憶體、GPU、網路速度和電池，旁邊還有一隻會隨 CPU 使用率加速奔跑的小動畫（刺蝟、檸檬，或你自己的動畫）。
+A small macOS menu bar hardware monitor. It shows CPU, memory, GPU, network speed and battery in real time, next to a little animation that runs faster the busier your CPU is. The animation can be a hedgehog, a lemon, or one of your own.
 
-![下拉面板（淺色／深色）](preview.png)
+![Dropdown panel (light / dark)](preview.png)
 
-## 功能
+> The app's interface is in Traditional Chinese. Menu names below are given in Chinese with an English translation.
 
-- **選單列**：CPU、記憶體、GPU、網路上下行、電池，每一項都可以在「在選單列顯示」中開關；使用率高時數字會變橘色或紅色。
-- **下拉面板**：每項指標畫成一顆晶片，資料粒子沿著電路流動，流速跟著使用率變化。下面還列出負載、Swap、磁碟、開機時間等詳細資訊。
-- **跑步動畫**：CPU 越忙跑越快。內建 10 段動畫：
-  - 刺蝟：經典奔跑、衝刺滑倒、跑累睡覺、滾球模式、追逐蘋果
-  - 檸檬：搭乘紙飛機、撐傘下雨、吃東西、變裝變形、打瞌睡休息
-- **自訂動畫**：把 GIF 或 PNG 丟進資料夾就能用（見下方）。
-- 可設定更新頻率（1／2／5 秒）、登入時自動啟動。
-- 很輕量：CPU 約 1%，記憶體約 15 MB；不連網路、不需要管理員權限。
+## Features
 
-需求：macOS 13 以上。
+- **Menu bar**: CPU, memory, GPU, network down/up and battery. Each one can be turned on or off under 在選單列顯示 (Show in menu bar), and values turn orange or red when usage is high.
+- **Dropdown panel**: each metric is drawn as a chip with data particles flowing along circuit traces, and the flow speed follows usage. Below it are details such as load average, swap, disk and uptime.
+- **Running animation**: the busier the CPU, the faster it runs. There are 10 built-in animations:
+  - Hedgehog: classic run, dash & slip, run & fall asleep, roll into a ball, chase the apple
+  - Lemon: paper plane ride, umbrella in the rain, snack time, costume change, nap time
+- **Custom animations**: drop a GIF or PNG into a folder and it shows up in the menu (see below).
+- Adjustable refresh interval (1 / 2 / 5 s) and an option to start at login.
+- Lightweight: about 1% CPU and about 15 MB of memory. No network access and no admin rights needed.
 
-## 編譯與安裝
+Requires macOS 13 or later.
+
+## Build & install
 
 ```sh
-xcode-select --install     # 第一次才需要：安裝 Apple 編譯工具
-./build.sh                 # 產生 build/ComputerMonitor.app
+xcode-select --install     # first time only: Apple's command line tools
+./build.sh                 # builds build/ComputerMonitor.app
 open build/ComputerMonitor.app
 ```
 
-自己編譯的 App 不會出現「無法驗證開發者」的警告。要用「登入時自動啟動」，請先把 App 移到「應用程式」資料夾。
+An app you build yourself opens without the "unidentified developer" warning. For 登入時自動啟動 (start at login) to work, move the app into your Applications folder first.
 
-`build/ComputerMonitor.app/Contents/MacOS/ComputerMonitor --print` 可以在終端機印出一次目前的數值。
+`build/ComputerMonitor.app/Contents/MacOS/ComputerMonitor --print` prints one sample of the current values in the terminal.
 
-## 自訂動畫
+## Custom animations
 
-在選單點「動畫樣式 → 打開自訂動畫資料夾…」，或直接打開：
+Choose 動畫樣式 → 打開自訂動畫資料夾… (Animation style → Open custom animation folder…) from the menu, or open this folder directly:
 
 ```
 ~/Library/Application Support/ComputerMonitor/Animations/
 ```
 
-把動畫放進去，再打開「動畫樣式」選單就會出現（名稱就是檔名）：
+Put your animation in it, then open the 動畫樣式 (Animation style) menu again and it will be listed under its file name.
 
-| 格式 | 檔名範例 | 格數 |
+| Format | Example | Frame count |
 |---|---|---|
-| GIF 動圖 | `貓咪.gif` | 自動讀取 |
-| 橫向連續格 PNG | `貓咪@8.png` | `@` 後面的數字；每格同寬、由左到右 |
-| 一格一張的資料夾 | `貓咪/1.png`、`2.png`… | 依檔名數字順序 |
+| Animated GIF | `cat.gif` | Read from the file |
+| Horizontal PNG strip | `cat@8.png` | The number after `@`; frames are equal width, left to right |
+| Folder with one image per frame | `cat/1.png`, `2.png`, … | Number of files, in natural sort order |
 
-- 背景請用透明；任何尺寸都可以，會自動等比例縮成選單列高度（寬高比 1:1～3:1 最適合）。
-- 播放速度由 CPU 使用率決定，GIF 自帶的速度會被忽略；最多 240 格。
+- Use a transparent background. Any size works, since frames are scaled to the menu bar height. Aspect ratios from 1:1 to 3:1 look best.
+- The playback speed follows CPU usage, so a GIF's own frame timing is ignored. The maximum is 240 frames.
 
-## 專案結構
+## Project layout
 
 ```
 Sources/
-  main.swift          App、選單、選單列顯示
-  GraphPanel.swift    下拉面板的晶片動畫
-  Metrics.swift       讀取 CPU／記憶體／GPU／網路／磁碟／電池
-  Hedgehog.swift      跑步動畫的載入與自訂動畫資料夾
+  main.swift          app, menus, menu bar display
+  GraphPanel.swift    chip animation in the dropdown panel
+  Metrics.swift       reads CPU / memory / GPU / network / disk / battery
+  Hedgehog.swift      loads the running animations and the custom folder
 Resources/
-  Animations/         內建動畫（<名稱>@<格數>.png，高 36 px）
+  Animations/         built-in animations (<name>@<frames>.png, 36 px tall)
   AppIcon.icns, icon-1024.png
 Tools/
-  slice-hedgehog.py   把刺蝟原圖切成動畫條
-  slice-lemon.py      把檸檬原圖（黑底）切成動畫條
-  make-icon.sh/.swift 產生 App 圖示
-Cute Pixel Hedgehog Animation Sheet.png    刺蝟原圖（ChatGPT 生成）
-Cute Lemon Blob Animation Storyboard.png   檸檬原圖（ChatGPT 生成）
+  slice-hedgehog.py   cuts the hedgehog sheet into animation strips
+  slice-lemon.py      cuts the lemon storyboard (black background) into strips
+  make-icon.sh/.swift generates the app icon
+Cute Pixel Hedgehog Animation Sheet.png    hedgehog source art (generated with ChatGPT)
+Cute Lemon Blob Animation Storyboard.png   lemon source art (generated with ChatGPT)
 ```
 
-重新切內建動畫（需要 Python 的 pillow、numpy、scipy）：
+To re-cut the built-in animations (needs Python with pillow, numpy and scipy):
 
 ```sh
 python3 Tools/slice-hedgehog.py "Cute Pixel Hedgehog Animation Sheet.png" Resources/Animations preview-hedgehog.png
 python3 Tools/slice-lemon.py "Cute Lemon Blob Animation Storyboard.png" Resources/Animations preview-lemon.png
 ```
 
-## 分享給別人
+## Sharing the app
 
 ```sh
 ditto -c -k --keepParent build/ComputerMonitor.app ComputerMonitor.zip
 ```
 
-目前的 App 只有臨時（ad-hoc）簽署、沒有經過 Apple 公證，對方第一次打開會被擋下：請到「系統設定 → 隱私權與安全性」按「強制打開」。在 Apple 晶片 Mac 上編譯的版本不能在 Intel Mac 上執行；Intel Mac 的使用者請自己用 `./build.sh` 編譯。
+The app is only ad-hoc signed and isn't notarized by Apple, so macOS blocks it the first time someone else opens it. They need to go to System Settings → Privacy & Security and click "Open Anyway". A build made on an Apple silicon Mac won't run on an Intel Mac, so Intel users should build it themselves with `./build.sh`.
